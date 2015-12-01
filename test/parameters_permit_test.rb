@@ -282,6 +282,23 @@ class NestedParametersTest < ActiveSupport::TestCase
     assert_filtered_out permitted[:book][:authors_attributes]['0'], :age_of_death
   end
 
+  test "fields_for_style_nested_params when key is number" do
+    params = ActionController::Parameters.new({
+      :book => {
+        :authors_attributes => {
+          0 => { :name => 'William Shakespeare', :age_of_death => '52' }
+        }
+      }
+    })
+    permitted = params.permit :book => { :authors_attributes => [ :name ] }
+
+    assert_not_nil permitted[:book][:authors_attributes][0]
+    assert_equal 'William Shakespeare', permitted[:book][:authors_attributes][0][:name]
+
+    assert_filtered_out permitted[:book][:authors_attributes][0], :age_of_death
+  end
+
+
   test "fields_for_style_nested_params with negative numbers" do
     params = ActionController::Parameters.new({
       :book => {
